@@ -82,7 +82,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
+
 //Implemtent: ---- Sprint:
 
 //2. construct HTTP Req:
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
   //4a. Call `recv` in a loop until there is no more data to receive from the server. 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
   //4b. Print the rcv'd response to stdout:
-    printf("%s\n, buf");
+    printf("%s\n", buf);
   }
   //5. Clean up any allocated memory and open file descriptors:
   free(urlinfo);
