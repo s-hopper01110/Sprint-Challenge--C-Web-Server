@@ -45,9 +45,20 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+ //1.Use strchr to find the first slash in the URL:
+ char *first_slash = strchr(hostname, '/');
+ //2.Set the path pointer to 1 character after the spot returned by strchr:
+ path = first_slash + 1;
+ //3.Overwrite the slash with a '\0' so that we are no longer considering anything after the slash:
+ //set first_slash = \0
+ *first_slash = '\0';
+ //4.Use strchr to find the first colon in the URL:
+ char *first_colon = strchr(hostname, ':');
+ 
+
+
+
+  
 
   return urlinfo;
 }
