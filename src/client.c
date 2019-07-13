@@ -44,10 +44,26 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+//----Sprint:
+ //1.Use strchr to find the first slash in the URL:
+  char *first_slash = strchr(hostname, '/');
+ //2.Set the path pointer to 1 character after the spot returned by strchr:
+  path = first_slash + 1;
+ //3.Overwrite the slash with a '\0' so that we are no longer considering anything after the slash:
+ //set first_slash = \0
+  *first_slash = '\0';
+ //4.Use strchr to find the first colon in the URL:
+  char *first_colon = strchr(hostname, ':');
+ //5.Set the port pointer to 1 character after the spot returned by strchr:
+  port = first_colon + 1;
+//6.Overwrite the colon with a '\0' so that we are just left with the hostname.
+  *first_colon = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+//implement: assign to appropriate field struct
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -66,14 +82,34 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+//Implemtent: ---- Sprint:
 
-  return 0;
+//2. construct HTTP Req:
+//ex: GET /path HTTP/1.1
+//    Host: hostname:port
+//    Connection: close
+
+  int request_length = sprintf(request,
+  "GET /%s HTTP/1.1.\n"
+  "HOST: %s:%s\n"
+  "CONNECTION: close\n"
+  "\n",
+  path, hostname, port);
+
+  //send rqst:
+  int rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("Send");
+  }
+
+  return rv;
+
 }
+
+  
+
 
 int main(int argc, char *argv[])
 {  
@@ -92,10 +128,27 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  
+  //Implemtent: ---- Sprint:
+  //3.Connect to the server
+  //4.Send the request string down the socket
+  //5.Receive the response from the server and print it to stdout
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //1. Parse the input URL:
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  //2. Initialize a socket by calling the `get_socket` function from lib.c:
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  //3. Call `send_request` to construct the request and send it:
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  //4a. Call `recv` in a loop until there is no more data to receive from the server. 
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  //4b. Print the rcv'd response to stdout:
+    printf("%s\n", buf);
+  }
+  //5. Clean up any allocated memory and open file descriptors:
+  free(urlinfo);
+  close(sockfd);
+  
 
   return 0;
 }
